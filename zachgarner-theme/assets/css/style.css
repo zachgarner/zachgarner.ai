@@ -361,6 +361,15 @@ header .menu a:hover {
   color: #0e7a8f;
 }
 
+.part-hint {
+  font-family: 'Instrument Sans', sans-serif;
+  font-size: 0.68rem;
+  font-weight: 400;
+  color: #b0b0b0;
+  margin-left: auto;
+  white-space: nowrap;
+}
+
 .part-num {
   font-family: 'Instrument Sans', sans-serif;
   font-size: 0.68rem;
