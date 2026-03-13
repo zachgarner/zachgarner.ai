@@ -8,7 +8,7 @@
           <span class="category">{{#if primary_tag}}{{primary_tag.name}}{{/if}}</span>
           <h3>{{title}}</h3>
           <p>{{excerpt words="30"}}</p>
-          <span class="date">{{date format="MMM YYYY"}}</span>
+          <span class="date">{{date format="MMM YYYY"}} &middot; {{reading_time}} min</span>
         </a>
       {{/foreach}}
     {{/get}}
@@ -22,7 +22,7 @@
     {{#get "posts" filter="tag:hash-brief" limit="5" include="tags"}}
       {{#foreach posts}}
         <a href="{{url}}" class="brief">
-          <span class="brief-date">{{date format="MMM D"}}</span>
+          <span class="brief-date">{{date format="MMM D"}} &middot; {{reading_time}} min</span>
           <div class="brief-body">
             <h3>{{title}}</h3>
             <p>{{excerpt words="15"}}</p>
