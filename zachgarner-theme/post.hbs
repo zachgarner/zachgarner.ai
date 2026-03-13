@@ -1,0 +1,42 @@
+{{!< default}}
+
+{{#post}}
+{{#has tag="#brief"}}
+{{!-- Brief layout: no sidebar --}}
+<div class="brief-layout">
+  <div class="post-meta">Brief<span class="sep">/</span>{{#if primary_tag}}{{primary_tag.name}}{{/if}}<span class="sep">/</span>{{date format="MMM D, YYYY"}}</div>
+  <h1>{{title}}</h1>
+  {{#if custom_excerpt}}<p class="post-subtitle">{{custom_excerpt}}</p>{{/if}}
+
+  <div class="brief-content">
+    {{content}}
+  </div>
+
+  <div class="post-footer">
+    <p>Zach Garner builds AI systems and consults on agent infrastructure, LLM engineering, and production ML. <a href="/about/">More about Zach</a>.</p>
+  </div>
+</div>
+{{else}}
+{{!-- Article layout: with sidebar --}}
+<div class="article-layout">
+  <article>
+    <div class="post-meta">{{#if primary_tag}}{{primary_tag.name}}{{/if}}<span class="sep">/</span>{{date format="MMM YYYY"}}</div>
+    <h1>{{title}}</h1>
+    {{#if custom_excerpt}}<p class="post-subtitle">{{custom_excerpt}}</p>{{/if}}
+
+    {{content}}
+
+    <div class="post-footer">
+      <p>Zach Garner builds AI systems and consults on agent infrastructure, LLM engineering, and production ML. <a href="/about/">More about Zach</a>.</p>
+    </div>
+  </article>
+
+  <aside class="sidebar">
+    <div class="sidebar-section">
+      <a href="/about/" style="text-decoration:none;"><div class="sidebar-label">About the author</div></a>
+      <a href="/about/"><p>Zach Garner builds AI systems. Two decades of ML, computer vision, agents, and production infrastructure.</p></a>
+    </div>
+  </aside>
+</div>
+{{/has}}
+{{/post}}

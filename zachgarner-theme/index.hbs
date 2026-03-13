@@ -1,0 +1,16 @@
+{{!< default}}
+
+<section class="posts">
+  <div class="posts-grid">
+    {{#foreach posts}}
+      <a href="{{url}}" class="post">
+        <span class="category">{{#if primary_tag}}{{primary_tag.name}}{{/if}}</span>
+        <h3>{{title}}</h3>
+        <p>{{excerpt words="30"}}</p>
+        <span class="date">{{date format="MMM YYYY"}}</span>
+      </a>
+    {{/foreach}}
+  </div>
+</section>
+
+{{pagination}}

@@ -1,0 +1,44 @@
+{{!< default}}
+
+<section class="posts">
+  <div class="posts-grid">
+    {{#get "posts" filter="tag:-hash-brief" limit="3" include="tags"}}
+      {{#foreach posts}}
+        <a href="{{url}}" class="post">
+          <span class="category">{{#if primary_tag}}{{primary_tag.name}}{{/if}}</span>
+          <h3>{{title}}</h3>
+          <p>{{excerpt words="30"}}</p>
+          <span class="date">{{date format="MMM YYYY"}}</span>
+        </a>
+      {{/foreach}}
+    {{/get}}
+  </div>
+</section>
+
+<section class="briefs">
+  <div class="briefs-grid">
+    <div class="section-label" style="margin-top:1.5rem;">Briefs</div>
+
+    {{#get "posts" filter="tag:hash-brief" limit="5" include="tags"}}
+      {{#foreach posts}}
+        <a href="{{url}}" class="brief">
+          <span class="brief-date">{{date format="MMM D"}}</span>
+          <div class="brief-body">
+            <h3>{{title}}</h3>
+            <p>{{excerpt words="15"}}</p>
+          </div>
+          <span class="brief-category">{{#if primary_tag}}{{primary_tag.name}}{{/if}}</span>
+        </a>
+      {{/foreach}}
+    {{/get}}
+  </div>
+
+  <div class="subscribe-cell">
+    <div class="sidebar-label">Stay in the loop</div>
+    <p class="subscribe-text" style="max-width:16rem;">Monthly updates on what I'm building, thinking through, and learning. No bs, no spam. Tell your agent I said hi.</p>
+    <form data-members-form class="subscribe-form">
+      <input type="email" placeholder="you@email.com" class="subscribe-input" data-members-email required>
+      <button type="submit" class="subscribe-btn">Subscribe</button>
+    </form>
+  </div>
+</section>

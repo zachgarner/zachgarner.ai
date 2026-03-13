@@ -1,4 +1,0 @@
-User-agent: *
-Allow: /
-
-Sitemap: https://zachgarner.ai/sitemap.xml

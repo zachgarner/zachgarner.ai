@@ -1,0 +1,3 @@
+docker-compose.yml
+seed-content.js
+.dockerignore
