@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>The Agent Infrastructure Nobody Talks About - Zach Garner AI</title>
+  <meta name="description" content="Most agent frameworks focus on orchestration. The hard problems are elsewhere - state management, recovery, and knowing when to stop.">
+  <link rel="canonical" href="https://zachgarner.ai/post.html">
+  <link rel="icon" type="image/png" href="favicon.png">
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="The Agent Infrastructure Nobody Talks About">
+  <meta property="og:description" content="Most agent frameworks focus on orchestration. The hard problems are elsewhere - state management, recovery, and knowing when to stop.">
+  <meta property="og:url" content="https://zachgarner.ai/post.html">
+  <meta property="og:site_name" content="Zach Garner AI">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="The Agent Infrastructure Nobody Talks About">
+  <meta name="twitter:description" content="Most agent frameworks focus on orchestration. The hard problems are elsewhere - state management, recovery, and knowing when to stop.">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600&family=Lora:ital,wght@0,400;0,600;1,400&family=Source+Serif+4:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Source Serif 4', Georgia, serif;
+      background: #fcfbf9;
+      color: #2a2a2a;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .page {
+      max-width: 1240px;
+      margin: 0 auto;
+      padding: 0 2.5rem;
+    }
+
+    header {
+      padding: 1.5rem 0 2rem;
+      border-bottom: 1px solid #e0ddd7;
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+    }
+
+    header a.brand {
+      font-family: 'Lora', serif;
+      font-size: 1.2rem;
+      font-weight: 400;
+      color: #0e7a8f;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      text-decoration: none;
+    }
+
+    header .menu {
+      display: flex;
+      gap: 2rem;
+    }
+
+    header .menu a {
+      font-family: 'Instrument Sans', sans-serif;
+      font-size: 0.75rem;
+      font-weight: 500;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: #888;
+      text-decoration: none;
+    }
+
+    header .menu a:hover {
+      color: #0e7a8f;
+    }
+
+    .article-layout {
+      display: grid;
+      grid-template-columns: 1fr 240px;
+      gap: 4rem;
+      padding: 2.5rem 0 3rem;
+    }
+
+    article {
+      max-width: 680px;
+      overflow: visible;
+    }
+
+    .sidebar {
+      padding-top: 0.5rem;
+    }
+
+    .sidebar .sidebar-section {
+      margin-bottom: 2rem;
+    }
+
+    .sidebar .sidebar-label {
+      font-family: 'Instrument Sans', sans-serif;
+      font-size: 0.68rem;
+      font-weight: 500;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: #0e7a8f;
+      margin-bottom: 0.75rem;
+    }
+
+    .sidebar p {
+      font-size: 0.82rem;
+      color: #888;
+      line-height: 1.65;
+      margin-bottom: 0.5rem;
+    }
+
+    .sidebar a {
+      font-size: 0.82rem;
+      color: #8a7150;
+      text-decoration: none;
+      display: block;
+      margin-bottom: 0.35rem;
+    }
+
+    .sidebar a:hover {
+      color: #0e7a8f;
+    }
+
+    .sidebar .toc a {
+      font-family: 'Instrument Sans', sans-serif;
+      font-size: 0.75rem;
+      color: #888;
+      line-height: 1.8;
+    }
+
+    .post-meta {
+      font-family: 'Instrument Sans', sans-serif;
+      font-size: 0.68rem;
+      font-weight: 500;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: #8a7150;
+      margin-bottom: 0.75rem;
+    }
+
+    .post-meta .sep {
+      margin: 0 0.5rem;
+      color: #ccc;
+    }
+
+    article h1 {
+      font-family: 'Lora', serif;
+      font-size: 1.6rem;
+      font-weight: 400;
+      line-height: 1.35;
+      margin-bottom: 0.75rem;
+    }
+
+    .post-subtitle {
+      font-size: 1.05rem;
+      color: #888;
+      line-height: 1.6;
+      margin-bottom: 2.5rem;
+    }
+
+    article h2 {
+      font-family: 'Instrument Sans', sans-serif;
+      font-size: 0.75rem;
+      font-weight: 500;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: #0e7a8f;
+      margin-top: 2.25rem;
+      margin-bottom: 0.75rem;
+    }
+
+    article p {
+      font-size: 0.95rem;
+      color: #555;
+      line-height: 1.75;
+      margin-bottom: 1rem;
+    }
+
+    article code {
+      font-size: 0.88rem;
+      background: #f0eeea;
+      padding: 0.15rem 0.4rem;
+      border-radius: 3px;
+    }
+
+    article pre,
+    article pre[class*="language-"] {
+      background: #f0eeea !important;
+      padding: 1.25rem !important;
+      padding-left: 5rem !important;
+      border-radius: 4px;
+      overflow-x: auto;
+      margin-bottom: 1rem;
+      margin-left: -5rem;
+      margin-right: -5rem;
+    }
+
+    article pre code {
+      background: none;
+      padding: 0;
+      font-size: 0.85rem;
+      line-height: 1.6;
+    }
+
+    article a {
+      color: #8a7150;
+      text-decoration: none;
+    }
+
+    article a:hover {
+      color: #0e7a8f;
+    }
+
+    .post-footer {
+      margin-top: 3rem;
+      padding-top: 2rem;
+      border-top: 1px solid #e0ddd7;
+    }
+
+    .post-footer p {
+      font-size: 0.85rem;
+      color: #999;
+    }
+
+    footer {
+      border-top: 1px solid #e0ddd7;
+      padding: 2.5rem 0;
+      font-size: 0.72rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+    }
+
+    footer span {
+      font-family: 'Instrument Sans', sans-serif;
+      color: #b0b0b0;
+    }
+
+    .footer-links { font-family: 'Instrument Sans', sans-serif; font-size: 0.72rem; }
+    .footer-link { font-family: 'Instrument Sans', sans-serif; font-size: 0.72rem; color: #b0b0b0; text-decoration: none; }
+    .footer-link:hover { color: #0e7a8f; }
+    .footer-sep { margin: 0 0.75rem; }
+
+    @media (max-width: 740px) {
+      .page { padding: 0 1.5rem; }
+      header { padding: 1.5rem 0 1.5rem; flex-direction: column; gap: 1rem; }
+      header a.brand { font-size: 1rem; }
+      .article-layout { grid-template-columns: 1fr; }
+      .sidebar { display: none; }
+      article h1 { font-size: 1.3rem; }
+      footer { flex-direction: column; gap: 0.5rem; }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <header>
+      <a href="index.html" class="brand">Zach Garner <span>&middot;</span> AI</a>
+      <div class="menu">
+        <a href="index.html">Writing</a>
+        <a href="about.html">About</a>
+      </div>
+    </header>
+
+    <div class="article-layout">
+    <article>
+      <div class="post-meta">Agents<span class="sep">/</span>Mar 2026</div>
+      <h1>The Agent Infrastructure Nobody Talks About</h1>
+      <p class="post-subtitle">Most agent frameworks focus on orchestration. The hard problems are elsewhere - state management, recovery, and knowing when to stop.</p>
+
+      <p>Every agent framework wants to sell you on the DAG. Define your nodes, wire up your edges, let the LLM decide which path to take. It's a clean abstraction and a beautiful demo. It's also maybe 10% of what makes an agent work in production.</p>
+
+      <p>The other 90% is the stuff nobody puts in their README.</p>
+
+      <h2 id="state">State is the whole game</h2>
+
+      <p>An agent that runs for thirty seconds doesn't need state management. An agent that runs for thirty minutes - or thirty hours - does. And the moment your agent touches external systems (databases, APIs, file systems), you have a distributed state problem whether you wanted one or not.</p>
+
+      <p>The question isn't "what's the agent's current step." It's "if this process dies right now, can I resume without corrupting anything or repeating side effects?" Most frameworks punt on this entirely.</p>
+
+      <p>A minimal checkpoint looks something like this:</p>
+
+<pre><code class="language-python">checkpoint = {
+    "run_id": run.id,
+    "step": current_step,
+    "completed_actions": [a.id for a in actions if a.committed],
+    "pending_effects": [e.serialize() for e in side_effects],
+    "timestamp": time.time()
+}
+store.save(checkpoint)</code></pre>
+
+      <p>Simple, but most agent code doesn't even get this far.</p>
+
+      <h2 id="recovery">Recovery isn't retry</h2>
+
+      <p>Retry logic is table stakes. Recovery is harder. When an agent fails mid-task, you need to figure out what already happened, what the downstream effects were, and whether the world has changed since the last successful step. This is transactional thinking, not orchestration thinking.</p>
+
+      <p>The teams that get this right tend to come from infrastructure backgrounds, not ML backgrounds. They've built job schedulers and workflow engines before. They think in terms of idempotency and checkpoints, not chains and prompts.</p>
+
+      <h2 id="stopping">Knowing when to stop</h2>
+
+      <p>The hardest problem in agent systems isn't getting them to do things. It's getting them to stop. An agent with access to tools and a vague objective will happily burn tokens forever, exploring every tangent, retrying every failure, elaborating on every response.</p>
+
+      <p>Budgets help (token limits, step limits, time limits). But the real solution is tighter scoping. The best agent systems I've seen do less per invocation and compose at a higher level. Small, focused agents that finish fast and hand off cleanly beat one mega-agent that tries to do everything.</p>
+
+      <h2 id="boring">The boring parts matter most</h2>
+
+      <p>Logging. Observability. Cost tracking. Audit trails. None of this is exciting. All of it is mandatory if you're running agents in production with real users and real money. If you can't answer "what did the agent do, why, and how much did it cost" for every run, you're not ready to ship.</p>
+
+      <div class="post-footer">
+        <p>Zach Garner builds AI systems and consults on agent infrastructure, LLM engineering, and production ML. <a href="about.html">More about Zach</a>.</p>
+      </div>
+    </article>
+
+    <aside class="sidebar">
+      <div class="sidebar-section toc">
+        <div class="sidebar-label">In this post</div>
+        <a href="#state">State is the whole game</a>
+        <a href="#recovery">Recovery isn't retry</a>
+        <a href="#stopping">Knowing when to stop</a>
+        <a href="#boring">The boring parts matter most</a>
+      </div>
+
+      <div class="sidebar-section">
+        <div class="sidebar-label">About the author</div>
+        <p>Zach Garner builds AI systems. Two decades of ML, computer vision, agents, and production infrastructure.</p>
+        <a href="about.html">More &rarr;</a>
+      </div>
+
+      <div class="sidebar-section">
+        <div class="sidebar-label">Contact</div>
+        <a href="mailto:zach@zachgarner.ai">zach@zachgarner.ai</a>
+      </div>
+    </aside>
+    </div>
+
+    <footer>
+      <span>&copy; 2026 Zach Garner. All rights reserved.</span>
+      <div class="footer-links">
+        <a href="https://zaiahventures.com" class="footer-link">Zaiah Ventures</a>
+        <span class="footer-sep">/</span>
+        <a href="https://github.com/zachgarner" class="footer-link">GitHub</a>
+        <span class="footer-sep">/</span>
+        <a href="https://linkedin.com/in/zachgarner" class="footer-link">LinkedIn</a>
+      </div>
+    </footer>
+  </div>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+</body>
+</html>

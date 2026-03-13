@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>How the Physical AI Stack Evolved - Zach Garner AI</title>
+  <meta name="description" content="Robotics went from dozens of specialized perception models to unified VLAs like PI-0.5 that go from observation to motor action in a single forward pass. Each transition moved where the engineering effort lives.">
+  <link rel="canonical" href="https://zachgarner.ai/physical-ai-stack-evolution.html">
+  <link rel="icon" type="image/png" href="favicon.png">
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="How the Physical AI Stack Evolved">
+  <meta property="og:description" content="Robotics went from dozens of specialized perception models to unified VLAs like PI-0.5 that go from observation to motor action in a single forward pass. Each transition moved where the engineering effort lives.">
+  <meta property="og:url" content="https://zachgarner.ai/physical-ai-stack-evolution.html">
+  <meta property="og:site_name" content="Zach Garner AI">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="How the Physical AI Stack Evolved">
+  <meta name="twitter:description" content="Robotics went from dozens of specialized perception models to unified VLAs like PI-0.5 that go from observation to motor action in a single forward pass. Each transition moved where the engineering effort lives.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600&family=Lora:ital,wght@0,400;0,600;1,400&family=Source+Serif+4:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Source Serif 4', Georgia, serif;
+      background: #fcfbf9;
+      color: #2a2a2a;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .page {
+      max-width: 1240px;
+      margin: 0 auto;
+      padding: 0 2.5rem;
+    }
+
+    header {
+      padding: 1.5rem 0 2rem;
+      border-bottom: 1px solid #e0ddd7;
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+    }
+
+    header a.brand {
+      font-family: 'Lora', serif;
+      font-size: 1.2rem;
+      font-weight: 400;
+      color: #0e7a8f;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      text-decoration: none;
+    }
+
+    header .menu {
+      display: flex;
+      gap: 2rem;
+    }
+
+    header .menu a {
+      font-family: 'Instrument Sans', sans-serif;
+      font-size: 0.75rem;
+      font-weight: 500;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: #888;
+      text-decoration: none;
+    }
+
+    header .menu a:hover {
+      color: #0e7a8f;
+    }
+
+    .article-layout {
+      display: grid;
+      grid-template-columns: 1fr 240px;
+      gap: 4rem;
+      padding: 2.5rem 0 3rem;
+    }
+
+    article {
+      max-width: 680px;
+      overflow: visible;
+    }
+
+    .sidebar {
+      padding-top: 0.5rem;
+    }
+
+    .sidebar .sidebar-section {
+      margin-bottom: 2rem;
+    }
+
+    .sidebar .sidebar-label {
+      font-family: 'Instrument Sans', sans-serif;
+      font-size: 0.68rem;
+      font-weight: 500;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: #0e7a8f;
+      margin-bottom: 0.75rem;
+    }
+
+    .sidebar p {
+      font-size: 0.82rem;
+      color: #888;
+      line-height: 1.65;
+      margin-bottom: 0.5rem;
+    }
+
+    .sidebar a {
+      font-size: 0.82rem;
+      color: #8a7150;
+      text-decoration: none;
+      display: block;
+      margin-bottom: 0.35rem;
+    }
+
+    .sidebar a:hover {
+      color: #0e7a8f;
+    }
+
+    .sidebar .toc a {
+      font-family: 'Instrument Sans', sans-serif;
+      font-size: 0.75rem;
+      color: #888;
+      line-height: 1.8;
+    }
+
+    .post-meta {
+      font-family: 'Instrument Sans', sans-serif;
+      font-size: 0.68rem;
+      font-weight: 500;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: #8a7150;
+      margin-bottom: 0.75rem;
+    }
+
+    .post-meta .sep {
+      margin: 0 0.5rem;
+      color: #ccc;
+    }
+
+    article h1 {
+      font-family: 'Lora', serif;
+      font-size: 1.6rem;
+      font-weight: 400;
+      line-height: 1.35;
+      margin-bottom: 0.75rem;
+    }
+
+    .post-subtitle {
+      font-size: 1.05rem;
+      color: #888;
+      line-height: 1.6;
+      margin-bottom: 2.5rem;
+    }
+
+    article h2 {
+      font-family: 'Instrument Sans', sans-serif;
+      font-size: 0.75rem;
+      font-weight: 500;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: #0e7a8f;
+      margin-top: 2.25rem;
+      margin-bottom: 0.75rem;
+    }
+
+    article h3 {
+      font-family: 'Instrument Sans', sans-serif;
+      font-size: 0.7rem;
+      font-weight: 500;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: #b8b8b8;
+      margin-top: 1.5rem;
+      margin-bottom: 0.6rem;
+    }
+
+    article p {
+      font-size: 0.95rem;
+      color: #555;
+      line-height: 1.75;
+      margin-bottom: 1rem;
+    }
+
+    article a {
+      color: #8a7150;
+      text-decoration: none;
+    }
+
+    article a:hover {
+      color: #0e7a8f;
+    }
+
+    .post-footer {
+      margin-top: 3rem;
+      padding-top: 2rem;
+      border-top: 1px solid #e0ddd7;
+    }
+
+    .post-footer p {
+      font-size: 0.85rem;
+      color: #999;
+    }
+
+    footer {
+      border-top: 1px solid #e0ddd7;
+      padding: 2.5rem 0;
+      font-size: 0.72rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+    }
+
+    footer span {
+      font-family: 'Instrument Sans', sans-serif;
+      color: #b0b0b0;
+    }
+
+    .footer-links { font-family: 'Instrument Sans', sans-serif; font-size: 0.72rem; }
+    .footer-link { font-family: 'Instrument Sans', sans-serif; font-size: 0.72rem; color: #b0b0b0; text-decoration: none; }
+    .footer-link:hover { color: #0e7a8f; }
+    .footer-sep { margin: 0 0.75rem; }
+
+    @media (max-width: 740px) {
+      .page { padding: 0 1.5rem; }
+      header { padding: 1.5rem 0 1.5rem; flex-direction: column; gap: 1rem; }
+      header a.brand { font-size: 1rem; }
+      .article-layout { grid-template-columns: 1fr; }
+      .sidebar { display: none; }
+      article h1 { font-size: 1.3rem; }
+      footer { flex-direction: column; gap: 0.5rem; }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <header>
+      <a href="index.html" class="brand">Zach Garner <span>&middot;</span> AI</a>
+      <div class="menu">
+        <a href="index.html">Writing</a>
+        <a href="about.html">About</a>
+      </div>
+    </header>
+
+    <div class="article-layout">
+    <article>
+      <div class="post-meta">Physical AI<span class="sep">/</span>Historical<span class="sep">/</span>Mar 2026</div>
+      <h1>How the Physical AI Stack Evolved</h1>
+      <p class="post-subtitle">From specialized perception models to unified VLAs like PI-0.5 - each transition moved where the hard engineering problems live.</p>
+
+      <p>The physical AI stack has gone through three distinct eras in a relatively short period. If you're working in robotics, autonomous vehicles, or any domain where models need to interact with the physical world, the arc matters. Not as history for its own sake, but because each transition redefined what engineering teams build themselves vs. what they inherit - and the latest shift is changing the infrastructure requirements in ways most teams aren't prepared for.</p>
+
+      <svg viewBox="0 0 680 210" xmlns="http://www.w3.org/2000/svg" style="width:100%;margin:2.5rem 0 1.5rem;display:block;" aria-label="Evolution of the physical AI stack across three eras, showing where engineering effort concentrates">
+        <style>
+          .fig-label { font-family: 'Instrument Sans', sans-serif; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; }
+          .fig-box { fill: none; stroke: #ddd8d2; stroke-width: 1; }
+          .fig-active { fill: rgba(14,122,143,0.06); stroke: #0e7a8f; stroke-width: 1.2; }
+          .fig-tension { fill: rgba(232,146,42,0.15); stroke: #f0a030; stroke-width: 1.5; }
+          .fig-faint { fill: none; stroke: #e8e5e0; stroke-width: 0.75; stroke-dasharray: 4,3; }
+        </style>
+
+        <!-- Era labels -->
+        <text x="110" y="16" text-anchor="middle" class="fig-label" style="font-size:9px;fill:#0e7a8f;">Perception</text>
+        <text x="340" y="16" text-anchor="middle" class="fig-label" style="font-size:9px;fill:#0e7a8f;">Multimodal</text>
+        <text x="570" y="16" text-anchor="middle" class="fig-label" style="font-size:9px;fill:#0e7a8f;">VLA</text>
+
+        <!-- ERA 1 -->
+        <rect x="10" y="30" width="200" height="62" class="fig-active" rx="2"/>
+        <text x="110" y="56" text-anchor="middle" class="fig-label" style="font-size:8.5px;fill:#555;">Perception models</text>
+        <text x="110" y="72" text-anchor="middle" class="fig-label" style="font-size:7px;fill:#b8b8b8;">Many specialized, each with own pipeline</text>
+
+        <rect x="10" y="96" width="200" height="38" class="fig-box" rx="2"/>
+        <text x="110" y="120" text-anchor="middle" class="fig-label" style="font-size:8px;fill:#aaa;">Hand-coded planning</text>
+
+        <rect x="10" y="138" width="200" height="26" class="fig-box" rx="2"/>
+        <text x="110" y="155" text-anchor="middle" class="fig-label" style="font-size:7.5px;fill:#bbb;">Motor control</text>
+
+        <rect x="10" y="172" width="200" height="20" class="fig-faint" rx="2"/>
+        <text x="110" y="186" text-anchor="middle" class="fig-label" style="font-size:6.5px;fill:#ccc;">Per-model datasets</text>
+
+        <!-- ERA 2 -->
+        <rect x="230" y="30" width="220" height="44" class="fig-box" rx="2"/>
+        <text x="340" y="50" text-anchor="middle" class="fig-label" style="font-size:8.5px;fill:#aaa;">Vision-language model</text>
+        <text x="340" y="63" text-anchor="middle" class="fig-label" style="font-size:7px;fill:#ccc;">Inherited from pre-training</text>
+
+        <rect x="230" y="78" width="220" height="56" class="fig-active" rx="2"/>
+        <text x="340" y="102" text-anchor="middle" class="fig-label" style="font-size:8.5px;fill:#555;">System integration</text>
+        <text x="340" y="118" text-anchor="middle" class="fig-label" style="font-size:7px;fill:#b8b8b8;">Connecting reasoning to control</text>
+
+        <rect x="230" y="138" width="220" height="26" class="fig-box" rx="2"/>
+        <text x="340" y="155" text-anchor="middle" class="fig-label" style="font-size:7.5px;fill:#bbb;">Motor control</text>
+
+        <rect x="230" y="172" width="220" height="20" class="fig-faint" rx="2"/>
+        <text x="340" y="186" text-anchor="middle" class="fig-label" style="font-size:6.5px;fill:#ccc;">Pre-trained + task demos</text>
+
+        <!-- ERA 3 -->
+        <rect x="470" y="30" width="200" height="56" class="fig-box" rx="2"/>
+        <text x="570" y="54" text-anchor="middle" class="fig-label" style="font-size:8.5px;fill:#aaa;">VLA foundation model</text>
+        <text x="570" y="70" text-anchor="middle" class="fig-label" style="font-size:7px;fill:#ccc;">Observation to action, end to end</text>
+
+        <rect x="470" y="90" width="200" height="26" class="fig-box" rx="2"/>
+        <text x="570" y="107" text-anchor="middle" class="fig-label" style="font-size:7.5px;fill:#bbb;">Motor control</text>
+
+        <rect x="470" y="124" width="200" height="68" class="fig-tension" rx="2"/>
+        <text x="570" y="152" text-anchor="middle" class="fig-label" style="font-size:8.5px;fill:#d08820;">Data &amp; compute</text>
+        <text x="570" y="168" text-anchor="middle" class="fig-label" style="font-size:7px;fill:#b8b8b8;">Fleet demos, distributed training</text>
+
+        <!-- Annotation -->
+        <text x="340" y="207" text-anchor="middle" class="fig-label" style="font-size:7px;fill:#ccc;">The bottleneck migrates down the stack</text>
+      </svg>
+
+      <h2 id="perception">Perception: many models, narrow sight</h2>
+
+      <p>The first era was pure perception. Object detection, semantic segmentation, depth estimation, pose recognition. Each capability required its own model, its own labeled dataset, its own training pipeline. A production robotics system might have half a dozen vision models running in parallel, each responsible for one narrow task. AV stacks were even more fragmented - separate models for lane detection, pedestrian tracking, sign recognition, drivable surface estimation, each with its own failure modes and data requirements.</p>
+
+      <h3>Detection without context</h3>
+
+      <p>These models could see, but they couldn't understand. An object detector could tell you there's a mug on the table. It couldn't tell you the mug was upside down, too close to the edge, or that picking it up required approaching from a different angle because of the handle orientation. Every piece of contextual reasoning had to be hand-coded by engineers - explicit rules and heuristics layered on top of raw perceptual outputs.</p>
+
+      <h3>Brittle by design</h3>
+
+      <p>The engineering cost was significant. Each new object class or scene type meant more labeled data, more model training, more edge cases in the planning layer. And the resulting systems were brittle. They worked in the environments they were trained for and degraded outside them. If you've ever watched an AV perception stack struggle with construction zones or unusual lighting conditions, you've seen the limits of this era firsthand.</p>
+
+      <h2 id="cognition">Cognition: borrowed world knowledge</h2>
+
+      <p>Large language models changed what was possible. When vision encoders were paired with language models - producing multimodal systems like PaLI, GPT-4V, and Gemini - something qualitatively different emerged. A model trained on internet-scale data could look at a scene and reason about it. Not just detect objects, but understand spatial relationships, infer physical properties, describe what was happening and predict what might happen next.</p>
+
+      <h3>Scene comprehension for free</h3>
+
+      <p>For robotics, this was the first time pre-trained world knowledge could be brought into the stack without building it from scratch. A multimodal model could look at a cluttered workbench and understand that a screwdriver was partially occluded by a tape roll, that a parts bin was nearly empty, that an assembly was half-complete. Scene-level comprehension that previously required years of domain-specific engineering came partially for free through pre-training.</p>
+
+      <h3>The action gap</h3>
+
+      <p>But there was a structural gap. These models could perceive and reason, but they couldn't act. The connection between understanding a scene and generating motor commands still required a separate planning and control layer - typically hand-engineered, task-specific, and the source of most integration pain. Robotics teams gained a powerful front end for perception and reasoning, but the back end remained exactly as labor-intensive as before.</p>
+
+      <h2 id="vla">VLAs: the end-to-end shift</h2>
+
+      <p>Vision-language-action models closed that gap. Physical Intelligence's PI-zero was the inflection point: a single architecture that takes visual observation as input and produces motor actions as output. End to end. No hand-coded planner sitting between perception and actuation.</p>
+
+      <h3>Inside the architecture</h3>
+
+      <p>The architecture is worth understanding. PI-0.5 uses PaLI-Gemma as its vision-language backbone - inheriting the multimodal reasoning from the previous era - and extends it with action prediction heads trained on demonstration data. The training data is episodes: multi-camera video (typically three cameras per episode in datasets like Droid 1.0.1) paired with synchronized action and state trajectories. The model learns from demonstrations to map what it sees to what it should do.</p>
+
+      <h3>The foundation model pattern</h3>
+
+      <p>These are foundation models in the same structural sense as GPT or Claude. They're trained on broad, cross-embodiment data - demonstrations from many different robots performing many different tasks - and then fine-tuned for specific applications. A team building a warehouse picking system and a team building agricultural robotics can start from the same pre-trained VLA and diverge at the fine-tuning stage, using proprietary data from their own fleets and operating environments.</p>
+
+      <p>That's the pattern now replicating across the industry. Physical Intelligence built the foundation model. Companies like Bonsai Robotics are fine-tuning it with proprietary data for their specific domains. The data ecosystem is evolving to support this - Parquet still dominates as an episode index format, but MCAP is gaining traction particularly among AV companies because of its native ROS integration, and the LeRobot dataset format is emerging as a standard for combining multiple cross-embodiment sources into unified training sets.</p>
+
+      <h2 id="shift">Where the engineering effort moved</h2>
+
+      <p>Each era changed the ratio of what you build to what you inherit, and that ratio determines where your engineering team should be spending its time.</p>
+
+      <p>In the perception era, the hard problem was model development - architecture, labeling, training, integrating multiple specialized models into a coherent pipeline. In the multimodal era, the hard problem shifted to system integration - connecting powerful but general-purpose reasoning to domain-specific planning and control. With VLAs, the hard problem shifts again: to data and compute infrastructure.</p>
+
+      <svg viewBox="0 0 680 250" xmlns="http://www.w3.org/2000/svg" style="width:100%;margin:1.5rem 0 1.5rem;display:block;" aria-label="Stacked bar chart showing engineering effort shifting from model development to data and compute infrastructure across three eras">
+        <style>
+          .chart-label { font-family: 'Instrument Sans', sans-serif; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; }
+        </style>
+
+        <!-- Baseline -->
+        <line x1="60" y1="195" x2="620" y2="195" stroke="#e0ddd7" stroke-width="0.75"/>
+
+        <!-- BAR 1: Perception era (x=80, w=140) -->
+        <!-- Model development: 70% = 119px -->
+        <rect x="80" y="26" width="140" height="119" fill="rgba(14,122,143,0.12)" stroke="#0e7a8f" stroke-width="0.75" rx="1"/>
+        <!-- System integration: 25% = 42.5px -->
+        <rect x="80" y="145" width="140" height="43" fill="rgba(14,122,143,0.06)" stroke="#0e7a8f" stroke-width="0.5" rx="1"/>
+        <!-- Data & compute: 5% = 8.5px -->
+        <rect x="80" y="188" width="140" height="7" fill="rgba(232,146,42,0.22)" stroke="#f0a030" stroke-width="0.75" rx="1"/>
+
+        <!-- Labels -->
+        <text x="150" y="90" text-anchor="middle" class="chart-label" style="font-size:7.5px;fill:#0e7a8f;">Model</text>
+        <text x="150" y="101" text-anchor="middle" class="chart-label" style="font-size:7.5px;fill:#0e7a8f;">development</text>
+        <text x="150" y="171" text-anchor="middle" class="chart-label" style="font-size:6.5px;fill:#0e7a8f;opacity:0.5;">Integration</text>
+
+        <!-- X-axis label -->
+        <text x="150" y="213" text-anchor="middle" class="chart-label" style="font-size:8px;fill:#888;">Perception</text>
+        <text x="150" y="225" text-anchor="middle" class="chart-label" style="font-size:6.5px;fill:#bbb;">2012 - 2020</text>
+
+        <!-- BAR 2: Multimodal era (x=270, w=140) -->
+        <!-- Model development: 25% = 42.5px -->
+        <rect x="270" y="26" width="140" height="43" fill="rgba(14,122,143,0.12)" stroke="#0e7a8f" stroke-width="0.75" rx="1"/>
+        <!-- System integration: 55% = 93.5px -->
+        <rect x="270" y="69" width="140" height="93" fill="rgba(14,122,143,0.06)" stroke="#0e7a8f" stroke-width="0.5" rx="1"/>
+        <!-- Data & compute: 20% = 34px -->
+        <rect x="270" y="162" width="140" height="33" fill="rgba(232,146,42,0.22)" stroke="#f0a030" stroke-width="0.75" rx="1"/>
+
+        <!-- Labels -->
+        <text x="340" y="52" text-anchor="middle" class="chart-label" style="font-size:6.5px;fill:#0e7a8f;">Model dev</text>
+        <text x="340" y="120" text-anchor="middle" class="chart-label" style="font-size:7.5px;fill:#0e7a8f;opacity:0.6;">System</text>
+        <text x="340" y="131" text-anchor="middle" class="chart-label" style="font-size:7.5px;fill:#0e7a8f;opacity:0.6;">integration</text>
+        <text x="340" y="183" text-anchor="middle" class="chart-label" style="font-size:6.5px;fill:#d08820;">Data</text>
+
+        <!-- X-axis label -->
+        <text x="340" y="213" text-anchor="middle" class="chart-label" style="font-size:8px;fill:#888;">Multimodal</text>
+        <text x="340" y="225" text-anchor="middle" class="chart-label" style="font-size:6.5px;fill:#bbb;">2021 - 2024</text>
+
+        <!-- BAR 3: VLA era (x=460, w=140) -->
+        <!-- Model development: 10% = 17px -->
+        <rect x="460" y="26" width="140" height="17" fill="rgba(14,122,143,0.12)" stroke="#0e7a8f" stroke-width="0.75" rx="1"/>
+        <!-- System integration: 15% = 25.5px -->
+        <rect x="460" y="43" width="140" height="26" fill="rgba(14,122,143,0.06)" stroke="#0e7a8f" stroke-width="0.5" rx="1"/>
+        <!-- Data & compute: 75% = 127.5px -->
+        <rect x="460" y="69" width="140" height="126" fill="rgba(232,146,42,0.22)" stroke="#f0a030" stroke-width="1.2" rx="1"/>
+
+        <!-- Labels -->
+        <text x="530" y="125" text-anchor="middle" class="chart-label" style="font-size:8px;fill:#d08820;">Data &amp;</text>
+        <text x="530" y="137" text-anchor="middle" class="chart-label" style="font-size:8px;fill:#d08820;">compute</text>
+
+        <!-- X-axis label -->
+        <text x="530" y="213" text-anchor="middle" class="chart-label" style="font-size:8px;fill:#888;">VLA</text>
+        <text x="530" y="225" text-anchor="middle" class="chart-label" style="font-size:6.5px;fill:#bbb;">2024 - present</text>
+
+        <!-- Annotation -->
+        <text x="340" y="245" text-anchor="middle" class="chart-label" style="font-size:7px;fill:#ccc;">Approximate engineering effort allocation by era</text>
+      </svg>
+
+      <h3>Data as the differentiator</h3>
+
+      <p>If your foundation model already knows how to map perception to action, the differentiator becomes your proprietary data - fleet-specific demonstrations, domain edge cases, the scenarios that distinguish your operating environment from the general training distribution. And fine-tuning VLAs with that data is computationally demanding in ways that previous robotics models were not. These models are larger, they consume multi-camera video and synchronized sensor logs, and the preprocessing pipeline - video decoding, frame extraction, action normalization, embedding generation - is itself becoming a GPU-intensive workload.</p>
+
+      <h3>The infrastructure gap</h3>
+
+      <p>Bonsai Robotics started this journey with a single on-prem node. Two engineers, eight GPUs, training runs measured in days. That setup worked for classical perception models. For VLA fine-tuning with proprietary cross-embodiment data, it hit a wall. Physical Intelligence runs the same workloads across AWS and GCP, processing terabytes of video and logs. The infrastructure gap between those two points is where most robotics teams are right now - past the single node, not yet at production-scale distributed training.</p>
+
+      <h3>Reorganizing around the new reality</h3>
+
+      <p>The teams recognizing this shift are reorganizing around it. Less effort on model architecture, more on data pipelines and compute orchestration. Less time building perception stacks from scratch, more time curating demonstration datasets and iterating on fine-tuning experiments. The discipline that matters most has migrated from computer vision research to ML engineering and data infrastructure - and the teams that adapt to that reality fastest will iterate fastest.</p>
+
+      <div class="post-footer">
+        <p>Zach Garner builds AI systems and consults on ML engineering, distributed training, and production infrastructure. <a href="about.html">More about Zach</a>.</p>
+      </div>
+    </article>
+
+    <aside class="sidebar">
+      <div class="sidebar-section toc">
+        <div class="sidebar-label">In this post</div>
+        <a href="#perception">Perception: many models, narrow sight</a>
+        <a href="#cognition">Cognition: borrowed world knowledge</a>
+        <a href="#vla">VLAs: the end-to-end shift</a>
+        <a href="#shift">Where the engineering effort moved</a>
+      </div>
+
+      <div class="sidebar-section">
+        <div class="sidebar-label">About the author</div>
+        <p>Zach Garner builds AI systems. Two decades of ML, computer vision, agents, and production infrastructure.</p>
+        <a href="about.html">More &rarr;</a>
+      </div>
+
+      <div class="sidebar-section">
+        <div class="sidebar-label">Contact</div>
+        <a href="mailto:zach@zachgarner.ai">zach@zachgarner.ai</a>
+      </div>
+    </aside>
+    </div>
+
+    <footer>
+      <span>&copy; 2026 Zach Garner. All rights reserved.</span>
+      <div class="footer-links">
+        <a href="https://zaiahventures.com" class="footer-link">Zaiah Ventures</a>
+        <span class="footer-sep">/</span>
+        <a href="https://github.com/zachgarner" class="footer-link">GitHub</a>
+        <span class="footer-sep">/</span>
+        <a href="https://linkedin.com/in/zachgarner" class="footer-link">LinkedIn</a>
+      </div>
+    </footer>
+  </div>
+</body>
+</html>
