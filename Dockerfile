@@ -20,6 +20,8 @@ RUN set -ex \
     const fs = require('fs'); \
     const cfg = JSON.parse(fs.readFileSync('config.production.json','utf8')); \
     cfg.activeTheme = 'zachgarner-theme'; \
+    cfg.mail = { transport: 'Direct', options: {} }; \
+    cfg.logging = { transports: ['stdout'] }; \
     fs.writeFileSync('config.production.json', JSON.stringify(cfg, null, 2)); \
   "
 
