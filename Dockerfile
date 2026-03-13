@@ -22,6 +22,7 @@ RUN set -ex \
     cfg.activeTheme = 'zachgarner-theme'; \
     cfg.mail = { transport: 'Direct', options: {} }; \
     cfg.logging = { transports: ['stdout'] }; \
+    cfg.security = { staffDeviceVerification: false }; \
     fs.writeFileSync('config.production.json', JSON.stringify(cfg, null, 2)); \
   "
 
