@@ -342,14 +342,12 @@ header .menu a:hover {
 }
 
 .deep-dive-part {
-  font-family: 'Source Serif 4', Georgia, serif;
-  font-size: 0.9rem;
-  color: #2a2a2a;
   text-decoration: none;
-  padding: 0.5rem 0;
+  color: inherit;
+  padding: 0.6rem 0;
   border-bottom: 1px solid #f0eeea;
   display: flex;
-  align-items: baseline;
+  align-items: flex-start;
   gap: 0.75rem;
 }
 
@@ -357,8 +355,20 @@ header .menu a:hover {
   border-bottom: none;
 }
 
-.deep-dive-part:hover {
+.deep-dive-part:hover .part-title {
   color: #0e7a8f;
+}
+
+.part-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.part-title {
+  font-family: 'Source Serif 4', Georgia, serif;
+  font-size: 0.9rem;
+  color: #2a2a2a;
 }
 
 .part-hint {
@@ -366,8 +376,6 @@ header .menu a:hover {
   font-size: 0.68rem;
   font-weight: 400;
   color: #b0b0b0;
-  margin-left: auto;
-  white-space: nowrap;
 }
 
 .part-num {
