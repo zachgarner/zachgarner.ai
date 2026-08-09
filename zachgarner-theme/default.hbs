@@ -10,15 +10,36 @@
   {{ghost_head}}
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600&family=Lora:ital,wght@0,400;0,600;1,400&family=Source+Serif+4:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Lora:wght@400;500;600&display=block" rel="stylesheet">
   <link rel="stylesheet" href="{{asset "css/style.css"}}">
+  <script>
+    document.fonts.ready.then(function() {
+      document.documentElement.classList.add('fonts-loaded');
+    });
+  </script>
 </head>
 <body class="{{body_class}}">
-  <div class="page">
-    {{> header}}
-    {{{body}}}
-    {{> footer}}
-  </div>
+  {{> header}}
+  {{{body}}}
+  {{> footer}}
   {{ghost_foot}}
+  <script>
+    // Prep all code blocks before Prism loads
+    document.querySelectorAll('pre').forEach(function(pre) {
+      pre.classList.add('line-numbers');
+      var code = pre.querySelector('code');
+      if (code && !code.className.match(/language-/)) {
+        var text = code.textContent;
+        if (/^(import |from |def |class |@ray)/.test(text)) code.classList.add('language-python');
+        else if (/^(ray |kubectl |docker |npm |npx |pip |curl |git )/.test(text)) code.classList.add('language-bash');
+        else if (/^[\w_]+:(\s|$)/m.test(text) && !/[;{}()]/.test(text)) code.classList.add('language-yaml');
+        else code.classList.add('language-python');
+      }
+    });
+  </script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/line-numbers/prism-line-numbers.min.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/line-numbers/prism-line-numbers.min.css">
 </body>
 </html>

@@ -1,7 +1,7 @@
 {
   "name": "zachgarner-theme",
   "description": "Zach Garner AI - custom Ghost theme",
-  "version": "1.0.0",
+  "version": "2.0.2",
   "engines": {
     "ghost-api": "v5"
   },

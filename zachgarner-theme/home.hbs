@@ -1,63 +1,136 @@
 {{!< default}}
 
-<section class="posts">
-  <div class="posts-grid">
-    {{#get "posts" filter="tag:-hash-brief" limit="3" include="tags"}}
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-monogram" style="opacity:0; animation: fade-in 0.4s ease-out forwards; animation-delay: 0.2s;">ZG</div>
+  <h1><span style="opacity:0; color: rgba(0,0,0,0.5); animation: fade-in 0.4s ease-out forwards, gray-to-black 0.8s ease-out forwards; animation-delay: 0.4s, 2.6s;">I build & deploy</span><br><strong style="opacity:0; animation: emphasis-in-out 2.4s ease-in-out forwards; animation-delay: 0.85s;">high-scale,</strong> <strong style="opacity:0; animation: emphasis-in-out 2.4s ease-in-out forwards; animation-delay: 1.25s;">production</strong><br><span style="opacity:0; color: rgba(0,0,0,0.5); animation: fade-in 0.4s ease-out forwards, gray-to-black 0.8s ease-out forwards; animation-delay: 0.4s, 2.6s;">Artificial Intelligence.</span></h1>
+  <p class="subtitle" style="opacity:0; animation: fade-in 0.5s ease-out forwards; animation-delay: 2.4s;">From training pipelines to production agents. Two decades of machine learning, distributed systems, and technical leadership.</p>
+</section>
+
+<!-- SHOWCASE -->
+<section class="showcase">
+  <div class="showcase-grid">
+    <a href="#" class="showcase-item" style="opacity:0; animation: fade-in 0.8s ease-out forwards; animation-delay: 2.6s;">
+      <div class="showcase-card">
+        <div class="showcase-card-title">Anyscale</div>
+        <div class="showcase-card-role">Field Engineer</div>
+        <div class="showcase-card-meta">Ray & Distributed AI</div>
+      </div>
+    </a>
+    <a href="#" class="showcase-item" style="opacity:0; animation: fade-in 0.8s ease-out forwards; animation-delay: 2.8s;">
+      <div class="showcase-card">
+        <div class="showcase-card-title">Large-Scale AI</div>
+        <div class="showcase-card-role">Distributed Computing & AI</div>
+        <div class="showcase-card-meta">Since 2004</div>
+      </div>
+    </a>
+    <a href="#" class="showcase-item" style="opacity:0; animation: fade-in 0.8s ease-out forwards; animation-delay: 3.0s;">
+      <div class="showcase-card">
+        <div class="showcase-card-title">Field Engineering</div>
+        <div class="showcase-card-role">Customer-Facing</div>
+        <div class="showcase-card-meta">Technical Delivery</div>
+      </div>
+    </a>
+    <a href="#" class="showcase-item" style="opacity:0; animation: fade-in 0.8s ease-out forwards; animation-delay: 3.2s;">
+      <div class="showcase-card">
+        <div class="showcase-card-title">Production ML</div>
+        <div class="showcase-card-role">Training & Deployment</div>
+        <div class="showcase-card-meta">Scaling & Eval</div>
+      </div>
+    </a>
+    <a href="https://cognizantcoaching.com" class="showcase-item" style="opacity:0; animation: fade-in 0.8s ease-out forwards; animation-delay: 3.4s;">
+      <div class="showcase-card">
+        <div class="showcase-card-title">Coaching</div>
+        <div class="showcase-card-role">Co-Active Certified</div>
+        <div class="showcase-card-meta">400+ Hours</div>
+      </div>
+    </a>
+  </div>
+  <!-- TOPICS -->
+  <div class="topics-inline" style="opacity:0; animation: fade-in 0.8s ease-out forwards; animation-delay: 3.2s;">
+    <div class="section-label">Topics</div>
+    <div class="topics-names">
+      <a href="/tag/physical-ai/">Physical AI</a>
+      <span class="pipe">/</span>
+      <a href="#">Distributed Training</a>
+      <span class="pipe">/</span>
+      <a href="#">LLM Fine-Tuning</a>
+      <span class="pipe">/</span>
+      <a href="#">Scaling</a>
+      <span class="pipe">/</span>
+      <a href="/tag/agents/">Agents</a>
+    </div>
+  </div>
+
+
+</section>
+
+<div style="opacity:0; animation: fade-in 0.8s ease-out forwards; animation-delay: 3.4s;">
+
+<!-- ESSAYS -->
+<section class="essays-section" id="essays">
+  <div class="section-label">Essays & Briefs</div>
+  <div class="essays-cloud">
+    {{#get "posts" filter="tag:-hash-social" limit="all" include="tags"}}
       {{#foreach posts}}
-        <a href="{{url}}" class="post">
-          <span class="category">{{#if primary_tag}}{{primary_tag.name}}{{/if}}</span>
-          <h3>{{title}}</h3>
-          <p>{{excerpt words="30"}}</p>
-          <span class="date">{{date format="MMM YYYY"}}</span>
-        </a>
+        <a href="{{url}}">{{title}}</a>{{#unless @last}} <span class="pipe">/</span> {{/unless}}
       {{/foreach}}
     {{/get}}
+  </div>
+  <div class="hero-cta">
+    <a href="/archive/" class="btn-dark">Read my writing &rarr;</a>
   </div>
 </section>
 
-<section class="briefs">
-  <div class="briefs-grid">
-    <div class="section-label" style="margin-top:1.5rem;">Briefs</div>
-
-    {{#get "posts" filter="tag:hash-brief" limit="5" include="tags"}}
-      {{#foreach posts}}
-        <a href="{{url}}" class="brief">
-          <span class="brief-date">{{date format="MMM D"}}</span>
-          <div class="brief-body">
-            <h3>{{title}}</h3>
-            <p>{{excerpt words="15"}}</p>
-          </div>
-          <span class="brief-category">{{#if primary_tag}}{{primary_tag.name}}{{/if}}</span>
-        </a>
-      {{/foreach}}
-    {{/get}}
-  </div>
-
-  <div class="subscribe-cell">
-    <div class="sidebar-label">Stay in the loop</div>
-    <p class="subscribe-text" style="max-width:16rem;">Monthly updates on what I'm building, thinking through, and learning. No bs, no spam. Tell your agent I said hi.</p>
+<!-- SUBSCRIBE -->
+<section class="subscribe-section">
+  <div class="subscribe-inner">
+    <p class="subscribe-heading">Get my essays as they're published</p>
     <form data-members-form class="subscribe-form">
-      <input type="email" placeholder="you@email.com" class="subscribe-input" data-members-email required>
+      <input type="email" placeholder="Enter your email" class="subscribe-input" data-members-email required>
       <button type="submit" class="subscribe-btn">Subscribe</button>
     </form>
   </div>
 </section>
 
-<section class="deep-dives">
-  <div class="section-label" style="margin-top:1.5rem;">Deep Dives</div>
-  <div class="deep-dive-toc">
+<!-- DEEP DIVES -->
+<section class="deep-dives-section">
+  <div class="section-label">Deep Dives</div>
+  <div class="deep-dive-header">
+    <h3>Fine-Tuning VLAs at Scale</h3>
+    <span class="deep-dive-subtitle">A 5-Part Series on Physical AI</span>
+  </div>
+  <div class="deep-dive-grid">
     <div class="deep-dive-intro">
-      <h3>Fine-Tuning VLAs at Scale</h3>
       <p>VLAs go straight from camera input to motor control. One model, no perception stack, no hand-coded planner. But the training infrastructure that worked for LLMs doesn't transfer.</p>
-      <p style="margin-top:0.5rem;">This series covers what's different and what to build - from data pipelines through evaluation.</p>
-      <span class="deep-dive-meta">Physical AI &middot; 5 parts</span>
+      <p>This series covers what's different and what to build - from data pipelines through evaluation.</p>
     </div>
     <div class="deep-dive-parts">
-      <a href="#" class="deep-dive-part"><span class="part-num">1</span> The Data Problem <span class="part-hint">— Heterogeneous data breaks standard pipelines</span></a>
-      <a href="#" class="deep-dive-part"><span class="part-num">2</span> Decoupling CPU and GPU Scaling <span class="part-hint">— Why vertical scaling makes it worse</span></a>
-      <a href="#" class="deep-dive-part"><span class="part-num">3</span> Distributed Data Loading <span class="part-hint">— Streaming, sharding, and shuffle strategies</span></a>
-      <a href="#" class="deep-dive-part"><span class="part-num">4</span> Training Loop Optimization <span class="part-hint">— Profiling before you guess</span></a>
-      <a href="#" class="deep-dive-part"><span class="part-num">5</span> Evaluation at Scale <span class="part-hint">— Offline metrics vs real-world performance</span></a>
+      <a href="#" class="deep-dive-part"><span class="part-num">1</span><span class="part-title">The Data Problem</span><span class="part-hint">Heterogeneous data breaks standard pipelines</span></a>
+      <a href="#" class="deep-dive-part"><span class="part-num">2</span><span class="part-title">Decoupling CPU and GPU Scaling</span><span class="part-hint">Why vertical scaling makes it worse</span></a>
+      <a href="#" class="deep-dive-part"><span class="part-num">3</span><span class="part-title">Distributed Data Loading</span><span class="part-hint">Streaming, sharding, and shuffle strategies</span></a>
+      <a href="#" class="deep-dive-part"><span class="part-num">4</span><span class="part-title">Training Loop Optimization</span><span class="part-hint">Profiling before you guess</span></a>
+      <a href="#" class="deep-dive-part"><span class="part-num">5</span><span class="part-title">Evaluation at Scale</span><span class="part-hint">Offline metrics vs real-world performance</span></a>
     </div>
   </div>
 </section>
+
+<!-- ABOUT STRIP -->
+<section class="about-strip">
+  <div class="about-grid">
+    <div class="about-col">
+      <h3>Background</h3>
+      <p>Twenty years building AI systems - from early computer vision and machine learning through the current wave of LLMs and autonomous agents.</p>
+    </div>
+    <div class="about-col">
+      <h3>Current Work</h3>
+      <p>Field engineer at <a href="https://anyscale.com">Anyscale</a>, the company behind Ray - working with robotics and autonomous vehicle teams on production AI infrastructure.</p>
+    </div>
+    <div class="about-col">
+      <h3>Consulting & Coaching</h3>
+      <p>Independent AI consulting and Co-Active certified <a href="https://cognizantcoaching.com">coaching</a> for technical leaders and engineering teams.</p>
+    </div>
+  </div>
+</section>
+
+</div><!-- end fade-in wrapper -->
